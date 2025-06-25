@@ -1,15 +1,16 @@
-
 import { NextResponse } from 'next/server';
-// Update the import path to the correct relative location if using local imports
-import { PrismaClient } from '@prisma/client';
 import { supabase } from '@/lib/supabase';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+// Add this to mark the route as dynamic
+export const dynamic = 'force-dynamic';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     const { name, email, password } = await request.json();
-
+    
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Name, email, and password are required' },
