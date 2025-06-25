@@ -67,6 +67,7 @@ export default function RegisterPage() {
         }),
       }); 
       const data = await response.json();
+      
 if(response.status !== 200) {
         throw new Error(data.error || "Failed to create account");
       }
