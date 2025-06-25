@@ -50,9 +50,26 @@ export default function RegisterPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
+
     try {
       // Here we'll add Supabase authentication
+  
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
+     const response =  await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,    
+          password: values.password,
+        }),
+      }); 
+      const data = await response.json();
+if(response.status !== 200) {
+        throw new Error(data.error || "Failed to create account");
+      }
       router.push("/dashboard");
       toast({
         title: "Success",

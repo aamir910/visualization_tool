@@ -35,7 +35,9 @@ export default function LoginPage() {
 
     try {
       // Here we'll add Supabase authentication
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
+
+
+      // await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
       router.push("/dashboard");
       toast({
         title: "Success",
