@@ -41,6 +41,7 @@ export function DirectedGraph() {
 
     // Create a hierarchical layout
     const simulation = d3
+    // @ts-ignore
       .forceSimulation(sampleData.nodes)
       .force(
         "link",

@@ -44,6 +44,7 @@ export function NetworkGraph() {
 
     // Create simulation
     const simulation = d3
+      // @ts-ignore
       .forceSimulation(sampleData.nodes)
       .force(
         "link",

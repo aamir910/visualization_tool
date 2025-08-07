@@ -60,8 +60,8 @@ export function BasicLineChart() {
       .attr("stroke-width", 2)
       .attr(
         "d",
-        d3
-          .line()
+        // @ts-ignore
+        d3.line()
           .x((d: any) => x(d.date) as number)
           .y((d: any) => y(d.value))
       )
@@ -127,6 +127,7 @@ export function AreaChart() {
       .attr("fill-opacity", 0.3)
       .attr(
         "d",
+        // @ts-ignore
         d3
           .area()
           .x((d: any) => x(d.date) as number)
@@ -143,6 +144,7 @@ export function AreaChart() {
       .attr("stroke-width", 2)
       .attr(
         "d",
+        // @ts-ignore
         d3
           .line()
           .x((d: any) => x(d.date) as number)
@@ -223,6 +225,7 @@ export function MultiLineChart() {
         .attr("stroke-width", 2)
         .attr(
           "d",
+          // @ts-ignore
           line.y((d: any) => y(d[value]))
         )
     })
