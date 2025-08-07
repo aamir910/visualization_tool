@@ -40,43 +40,50 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+ async function onSubmit(values: z.infer<typeof formSchema>) {
+  setIsLoading(true);
 
-    try {
-      // Here we'll add Supabase authentication
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+    });
 
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      });
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        throw new Error(data.error || "Failed to create account");
-      }
-
-      router.push("/dashboard");
-      toast({
-        title: "Success",
-        description: "You have successfully logged in.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to log in");
     }
+
+    // Validate that the response contains user and session data
+    if (!data.user || !data.session) {
+      throw new Error("Invalid response from server");
+    }
+
+    // Optionally store the session token (e.g., in cookies or local storage)
+    // Example: localStorage.setItem("supabase-session", JSON.stringify(data.session));
+
+    router.push("/dashboard");
+    toast({
+      title: "Success",
+      description: "You have successfully logged in.",
+    });
+  } catch (error: any) {
+    toast({
+      title: "Error",
+      description: error.message || "Invalid email or password. Please try again.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">

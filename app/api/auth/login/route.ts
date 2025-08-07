@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
-// import { PrismaClient } from '@prisma/client';
 import { supabase } from '@/lib/supabase';
-import { PrismaClient } from '@/lib/generated/prisma';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
@@ -16,26 +12,28 @@ export async function POST(request: Request) {
       );
     }
 
+    // Normalize email (optional, depending on your requirements)
+    const normalizedEmail = email.trim().toLowerCase();
+
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: normalizedEmail,
       password,
     });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) {
+    if (error || !data.user || !data.session) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+        { error: error?.message || 'Invalid email or password' },
+        { status: 401 }
       );
     }
 
+    // Return only the necessary user data and session
     return NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name },
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata?.name || null, // Adjust based on your Supabase user metadata
+      },
       session: data.session,
     });
   } catch (error) {
@@ -44,7 +42,5 @@ export async function POST(request: Request) {
       { error: 'Internal server error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
