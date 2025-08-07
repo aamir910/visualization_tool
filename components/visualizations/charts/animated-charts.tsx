@@ -83,13 +83,12 @@ export function DropAnimationChart() {
         data: lineData,
         options: {
           responsive: true,
-          // @ts-expect-error Chart.js supports per-property animation config
           animation: {
             y: {
               duration: 1200,
               easing: "easeOutBounce"
             }
-          },
+          } as any, // Type assertion to bypass TypeScript error
           plugins: {
             legend: { display: false },
             tooltip: { enabled: true }
@@ -146,7 +145,6 @@ export function ProgressiveLineChart() {
         data: lineData,
         options: {
           responsive: true,
-          // @ts-expect-error Chart.js supports per-property animation config
           animation: {
             x: {
               type: "number",
@@ -170,7 +168,7 @@ export function ProgressiveLineChart() {
                 return ctx.index * 300
               }
             }
-          },
+          } as any, // Type assertion to bypass TypeScript error
           plugins: {
             legend: { display: true },
             tooltip: { enabled: true }
@@ -197,7 +195,6 @@ export function ProgressiveLineEasingChart() {
         data: lineData,
         options: {
           responsive: true,
-          // @ts-expect-error Chart.js supports per-property animation config
           animation: {
             x: {
               type: "number",
@@ -221,7 +218,7 @@ export function ProgressiveLineEasingChart() {
                 return ctx.index * 350
               }
             }
-          },
+          } as any, // Type assertion to bypass TypeScript error
           plugins: {
             legend: { display: true },
             tooltip: { enabled: true }
@@ -233,4 +230,4 @@ export function ProgressiveLineEasingChart() {
   }, [])
 
   return <div className="w-full h-full min-h-[300px]"><canvas ref={chartRef} /></div>
-} 
+}
