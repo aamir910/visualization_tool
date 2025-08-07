@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { PrismaClient } from '@/lib/generated/prisma';
 
 // Add this to mark the route as dynamic
 export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
+import { PrismaClient } from '@/lib/generated/prisma';
 
 const prisma = new PrismaClient();
 
