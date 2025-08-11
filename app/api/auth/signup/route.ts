@@ -5,9 +5,9 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { PrismaClient } from '@/lib/generated/prisma';
 
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
+  const prisma = new PrismaClient();
   try {
     const { name, email, password } = await request.json();
     
