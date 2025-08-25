@@ -3,29 +3,51 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy dependency files
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-RUN npm install || yarn install || pnpm install
+# Install required packages (openssl for Prisma, python3/make/g++ for node-gyp builds)
+RUN apk add --no-cache openssl python3 make g++
 
-# Copy rest of the code
+# Copy dependency files
+COPY package.json package-lock.json* ./
+
+# Copy Prisma schema first (so prisma generate works)
+COPY prisma ./prisma
+
+# Install dependencies
+RUN npm install
+
+# Generate Prisma client explicitly (important for Next.js build)
+RUN npx prisma generate
+
+# Copy the rest of the app
 COPY . .
 
 # Build Next.js app
 RUN npm run build
+
+# Copy Prisma engines into .next (so Next.js can find them at runtime)
+RUN mkdir -p .next/server/.prisma/client \
+  && cp -r node_modules/.prisma/client/* .next/server/.prisma/client/
+
 
 # Stage 2: Run the app
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Copy only what's needed
+# Install runtime dependencies
+RUN apk add --no-cache openssl
+
+# Copy runtime files only
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/prisma ./prisma
 
-# If you want envs in container
-COPY .env .env
+# Copy env (make sure DATABASE_URL and DIRECT_URL are inside .env)
+COPY .env* ./
 
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# Run Prisma migrations before starting the app
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
