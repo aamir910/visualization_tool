@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,36 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { BarChart2, Database, Home, LineChart, PieChart } from "lucide-react";
 
 export function Navbar() {
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUserName() {
+      try {
+        const response = await fetch("/api/auth/get-user");
+        if (response.ok) {
+          const data = await response.json();
+          setUserName(data.name || null);
+        } else {
+          setUserName(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user name:", error);
+        setUserName(null);
+      }
+    }
+    fetchUserName();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUserName(null);
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-full px-4 flex h-16 items-center justify-between">
@@ -74,13 +105,24 @@ export function Navbar() {
         </NavigationMenu>
         
         <div className="flex items-center gap-4">
+          <span className="text-sm font-medium">
+            {userName ? `Welcome, ${userName}` : "Welcome, Guest"}
+          </span>
           <ModeToggle />
-          <Button asChild variant="outline">
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/register">Sign Up</Link>
-          </Button>
+          {userName ? (
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <>
+              <Button asChild variant="outline">
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

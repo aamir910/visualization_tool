@@ -71,7 +71,7 @@ export default function RegisterPage() {
 if(response.status !== 200) {
         throw new Error(data.error || "Failed to create account");
       }
-      router.push("/dashboard");
+      router.push("/login");
       toast({
         title: "Success",
         description: "Your account has been created successfully.",

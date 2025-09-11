@@ -40,50 +40,60 @@ export default function LoginPage() {
     },
   });
 
- async function onSubmit(values: z.infer<typeof formSchema>) {
-  setIsLoading(true);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
 
-  try {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: values.email,
-        password: values.password,
-      }),
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to log in");
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to log in");
+      }
+
+      // Validate that the response contains user and session data
+      if (!data.user || !data.session) {
+        throw new Error("Invalid response from server");
+      }
+
+      // Store session tokens in HTTP-only, secure cookies
+      await fetch("/api/auth/set-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_at: data.session.expires_at,
+        }),
+      });
+
+      router.push("/dashboard");
+      toast({
+        title: "Success",
+        description: "You have successfully logged in.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Invalid email or password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    // Validate that the response contains user and session data
-    if (!data.user || !data.session) {
-      throw new Error("Invalid response from server");
-    }
-
-    // Optionally store the session token (e.g., in cookies or local storage)
-    // Example: localStorage.setItem("supabase-session", JSON.stringify(data.session));
-
-    router.push("/dashboard");
-    toast({
-      title: "Success",
-      description: "You have successfully logged in.",
-    });
-  } catch (error: any) {
-    toast({
-      title: "Error",
-      description: error.message || "Invalid email or password. Please try again.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsLoading(false);
   }
-}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
