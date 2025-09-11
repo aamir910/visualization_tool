@@ -56,7 +56,7 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-
+console.log(data.user.name,  "here is the data");
       if (!response.ok) {
         throw new Error(data.error || "Failed to log in");
       }
@@ -76,6 +76,7 @@ export default function LoginPage() {
           access_token: data.session.access_token,
           refresh_token: data.session.refresh_token,
           expires_at: data.session.expires_at,
+          name: data.user.name,
         }),
       });
 
