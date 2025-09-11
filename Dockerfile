@@ -1,10 +1,12 @@
 # Stage 1: Build the Next.js app
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
 # Install required packages (openssl for Prisma, python3/make/g++ for node-gyp builds)
-RUN apk add --no-cache openssl python3 make g++
+RUN apt-get update \
+  && apt-get install -y openssl python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files
 COPY package.json package-lock.json* ./
@@ -30,12 +32,14 @@ RUN mkdir -p .next/server/.prisma/client \
 
 
 # Stage 2: Run the app
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
 # Install runtime dependencies
-RUN apk add --no-cache openssl
+RUN apt-get update \
+  && apt-get install -y openssl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Copy runtime files only
 COPY --from=builder /app/package.json ./package.json

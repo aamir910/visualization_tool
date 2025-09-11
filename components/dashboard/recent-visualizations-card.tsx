@@ -76,7 +76,7 @@ export function RecentVisualizationsCard() {
         ) : (
           <div className="flex flex-col items-center justify-center h-40 text-center">
             <p className="text-muted-foreground mb-4">
-              You haven't created any visualizations yet.
+           You haven&apos;t created any visualizations yet.
             </p>
             <Button asChild>
               <Link href="/dashboard/upload">Create Your First Visualization</Link>
