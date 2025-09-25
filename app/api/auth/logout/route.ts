@@ -19,24 +19,24 @@ export async function POST() {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     expires: new Date(0),
-    path: "/",
-  });
+      path: "/",
+    });
 
-  response.cookies.set("user-name", "", {
-    expires: new Date(0),
-    path: "/",
-  });
+    response.cookies.set("user-name", "", {
+      expires: new Date(0),
+      path: "/",
+    });
 
-  // If you want to sign out from Supabase as well
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    // If you want to sign out from Supabase as well
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-  if (supabaseUrl && supabaseKey) {
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Supabase doesn't need the access token here; it will clear sessions
-    await supabase.auth.signOut({ scope: "global" });
+      // Supabase doesn't need the access token here; it will clear sessions
+      await supabase.auth.signOut({ scope: "global" });
+    }
+
+    return response;
   }
-
-  return response;
-}

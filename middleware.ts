@@ -25,6 +25,6 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = {
+export const config = { 
   matcher: ["/" , "/dashboard/:path*", "/api/protected/:path*"],
 };
